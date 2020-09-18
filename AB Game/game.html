@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1A2B遊戲</title>
+    <script>
+
+
+    </script>
+
+</head>
+
+<body>
+
+
+
+    <form id="keynum">
+        <input type="text" name="N" id="Nsub" maxlength="1" size="1" oninput="next(this,'N1')">
+        <input type="text" name="N1" id="N1sub" maxlength="1" size="1" oninput="next(this,'N2')">
+        <input type="text" name="N2" id="N2sub" maxlength="1" size="1" oninput="next(this,'N3')">
+        <input type="text" name="N3" id="N3sub" maxlength="1" size="1" oninput="next(this,'S')">
+        <input type="submit" id="subS" name="S" value="送出">
+    </form>
+    <form id="ranform">
+        <input id="startgame" type="submit" name="btnstart" value="開始遊戲">
+    </form>
+    <span id="resultans"></span>
+    <span id="answer"></span>
+    <textarea id="txtshow" name="showtext" rows="10" cols="30" readonly></textarea>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        function next(obj, nextn) {
+            if (obj.value.length == obj.maxLength) {
+                obj.form.elements[nextn].focus();
+            }
+        }
+
+        $("#keynum :input").attr("disabled", true);
+
+
+
+
+        //生成四位亂數
+        //利用ajax傳到php
+        $('#ranform').submit(function (e) {
+            e.preventDefault();
+            if ($("#startgame").val() == '重新開始') {
+                window.location.reload();
+            }
+            else {
+                var ranData = $('#ranform').serialize();
+                $.ajax({
+                    type: 'POST',
+                    url: 'start.php',
+                    data: {
+                        ran: ranData
+                    },
+                    success: function (e) {
+                        $("#answer").text(e);
+                        $("#keynum :input").attr("disabled", false);
+                        $("#answer").hide();
+                        $("#startgame").attr("disabled", true);
+                    }
+                })
+            }
+        })
+
+
+        $('#keynum').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: 'abgame.php',
+                data: {
+                    num: $("#Nsub").val(),
+                    num1: $("#N1sub").val(),
+                    num2: $("#N2sub").val(),
+                    num3: $("#N3sub").val()
+                },
+                success: function (e) {
+                    var showtxt = e + "\n";
+                    $("#txtshow").append(showtxt);
+                    if (e.length > 15) {
+                        $("#startgame").val("重新開始");
+                        $("#startgame").attr("disabled", false);
+                    }
+                }
+            })
+        })
+
+    </script>
+
+</body>
+
+</html>
